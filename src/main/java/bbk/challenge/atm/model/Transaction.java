@@ -1,6 +1,5 @@
-package bbk.challenge.atm.data;
+package bbk.challenge.atm.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

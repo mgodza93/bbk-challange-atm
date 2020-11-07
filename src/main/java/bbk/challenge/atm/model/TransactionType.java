@@ -1,4 +1,4 @@
-package bbk.challenge.atm.data;
+package bbk.challenge.atm.model;
 
 public enum TransactionType {
 
