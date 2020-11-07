@@ -10,6 +10,7 @@ import net.jodah.expiringmap.ExpiringMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
@@ -23,7 +24,7 @@ public class TokenGenerator {
     @Value("${token.generator.key}")
     private String tokenGeneratorKey;
 
-    private Map<String, String> userNameToToken = ExpiringMap.builder().expiration(Constants.TOKEN_DURATION, TimeUnit.MILLISECONDS).build();
+    private final Map<String, String> userNameToToken = ExpiringMap.builder().expiration(Constants.TOKEN_DURATION, TimeUnit.MILLISECONDS).build();
 
     private String getJWT(String userName, UserType userType) {
 
@@ -81,5 +82,10 @@ public class TokenGenerator {
     public String getUserName(String authenticatedJwt) {
 
         return decodeJWT(authenticatedJwt).getSubject();
+    }
+
+    @PreDestroy
+    public void clear() {
+        userNameToToken.clear();
     }
 }

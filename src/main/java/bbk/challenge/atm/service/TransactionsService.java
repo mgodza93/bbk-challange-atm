@@ -10,8 +10,8 @@ public class TransactionsService {
 
     @Autowired private TransactionRepository transactionRepository;
 
-    public Transaction saveTransaction(Transaction transaction) {
+    public void saveTransaction(Transaction transaction) {
 
-        return transactionRepository.save(transaction);
+        transactionRepository.save(transaction);
     }
 }

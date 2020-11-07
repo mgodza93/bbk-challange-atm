@@ -1,4 +1,4 @@
-package bbk.challenge.atm.rest;
+package bbk.challenge.atm.controller;
 
 import bbk.challenge.atm.service.ATMService;
 import bbk.challenge.atm.utils.InputInvalidException;
