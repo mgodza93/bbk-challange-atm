@@ -31,7 +31,7 @@ public class AuthenticationService {
         if (userByName.isPresent()) {
             User user = userByName.get();
             if (Objects.equals(user.getPassword(), encryptedPassword)) {
-                return tokenGenerator.authenticateUser(user.getUserName(), user.getUserType());
+                return tokenGenerator.authenticateUser(user.getName(), user.getUserType());
             }
         }
 
