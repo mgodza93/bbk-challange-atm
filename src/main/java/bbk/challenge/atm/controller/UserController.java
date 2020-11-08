@@ -1,7 +1,7 @@
 package bbk.challenge.atm.controller;
 
 import bbk.challenge.atm.model.User;
-import bbk.challenge.atm.service.AuthenticationService;
+import bbk.challenge.atm.auth.AuthenticationService;
 import bbk.challenge.atm.service.UserService;
 import org.jsondoc.core.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;

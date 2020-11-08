@@ -1,6 +1,7 @@
 package bbk.challenge.atm.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
@@ -12,6 +13,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "transaction")
 @ApiObject(name = "Transaction", description = "Transaction entity used to store the adding of cash and the withdraws")
+@Builder
 public class Transaction {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO) private Long id;
@@ -30,8 +32,4 @@ public class Transaction {
 
     @ApiObjectField
     @Enumerated(EnumType.STRING) private TransactionType transactionType;
-
-    public Transaction(String userName, Integer addingNoBills, Integer addingAmount, long currentTimeMillis,
-            TransactionType transactionType) {
-    }
 }

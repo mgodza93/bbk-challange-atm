@@ -1,19 +1,21 @@
 package bbk.challenge.atm.controller;
 
 import bbk.challenge.atm.service.ATMService;
+import bbk.challenge.atm.utils.AuthenticationException;
+import bbk.challenge.atm.utils.AuthorizationException;
 import bbk.challenge.atm.utils.InputInvalidException;
+import bbk.challenge.atm.utils.MaxAmountExceededException;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
+import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -22,19 +24,43 @@ public class ATMController {
 
     @Autowired ATMService atmService;
 
-    @ApiMethod(description = "Method that allows a user to login")
+    @ApiMethod(description = "Method that allows a bank employee to add money to the ATM")
     @ApiResponseObject
     @ResponseBody
     @RequestMapping(value = "/atm/addCash", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> addCash(Map<String, Integer> denominatorToCount) {
+    public ResponseEntity<String> addCash(@RequestHeader("authorization") String authorization,
+            Map<String, Integer> denominatorToCount) {
 
         try {
-            atmService.addCash("", denominatorToCount);
+            atmService.addCash(authorization, denominatorToCount);
         } catch (InputInvalidException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (AuthenticationException | AuthorizationException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         return new ResponseEntity<>("Cash added successful!", HttpStatus.OK);
+    }
+
+    @ApiMethod(description = "Method that allows a card holder to withdraw money")
+    @ApiResponseObject
+    @ResponseBody
+    @RequestMapping(value = "/atm/withdrawCash", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> withdrawCash(@RequestHeader("authorization") String authorization,
+            @ApiQueryParam(name = "amount", description = "The amount of cash to withdraw") @RequestParam("amount")
+                    Long amount) {
+
+        Map<String, Integer> denominatorToCash;
+
+        try {
+            denominatorToCash = atmService.withdrawCash(authorization, amount);
+        } catch (AuthenticationException | AuthorizationException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        } catch (MaxAmountExceededException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        return new ResponseEntity<>(denominatorToCash, HttpStatus.OK);
     }
 
 }

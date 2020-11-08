@@ -1,6 +1,6 @@
 package bbk.challenge.atm.service;
 
-import bbk.challenge.atm.authentication.PasswordEncrypt;
+import bbk.challenge.atm.auth.PasswordEncrypt;
 import bbk.challenge.atm.model.User;
 import bbk.challenge.atm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package bbk.challenge.atm.authentication;
+package bbk.challenge.atm.auth;
 
 import bbk.challenge.atm.model.UserType;
 import bbk.challenge.atm.utils.Constants;

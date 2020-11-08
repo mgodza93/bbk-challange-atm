@@ -1,6 +1,5 @@
-package bbk.challenge.atm.controller;
+package bbk.challenge.atm.auth;
 
-import bbk.challenge.atm.service.AuthenticationService;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiQueryParam;

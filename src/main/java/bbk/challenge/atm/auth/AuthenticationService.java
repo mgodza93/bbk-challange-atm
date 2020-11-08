@@ -1,9 +1,8 @@
-package bbk.challenge.atm.service;
+package bbk.challenge.atm.auth;
 
-import bbk.challenge.atm.authentication.PasswordEncrypt;
-import bbk.challenge.atm.authentication.TokenGenerator;
 import bbk.challenge.atm.model.User;
 import bbk.challenge.atm.model.UserType;
+import bbk.challenge.atm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,5 +64,10 @@ public class AuthenticationService {
     private boolean userTypeWithReadPermissions(String userType) {
 
         return Objects.equals(userType, UserType.BANK_EMPLOYEE.toString()) || Objects.equals(userType, UserType.CARD_HOLDER.toString());
+    }
+
+    public String getUserName(String authentication) {
+
+        return tokenGenerator.getUserName(authentication);
     }
 }
