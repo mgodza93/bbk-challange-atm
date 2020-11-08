@@ -24,6 +24,8 @@ public class ATMService {
 
     @Autowired private AuthenticationService authenticationService;
 
+    @Autowired private KnapsackService knapsackService;
+
     private ConcurrentMap<String, Integer> denominatorToCount = new ConcurrentHashMap<>();
     private Integer noBills = 0;
     private Long maxAmount = 0L;
@@ -64,7 +66,6 @@ public class ATMService {
                 .build();
 
         transactionsService.saveTransaction(transaction);
-
     }
 
     public Map<String, Integer> withdrawCash(String authentication, Long amount)
@@ -85,9 +86,15 @@ public class ATMService {
                     String.format("Amount exceeded! Requested: %d! Max allowed: %d", amount, maxAmount));
         }
 
+        Map<String, Integer> denominatorToCashOfWithdraw = knapsackService.getDenominatorToCashOfWithdraw(
+                denominatorToCount, amount);
 
+        int noBillsToWithdraw = denominatorToCashOfWithdraw.values().stream().mapToInt(Integer::intValue).sum();
 
-        return null;
+        this.noBills -= noBillsToWithdraw;
+        this.maxAmount -= amount;
+
+        return denominatorToCashOfWithdraw;
     }
 
     @PreDestroy
