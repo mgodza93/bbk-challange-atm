@@ -47,18 +47,6 @@ Implementation details:
 
 Each transaction will be saved in the database, but the state of the ATM will always 
 start at 0(will have 0 cash when you start the application). 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Note that you will need lombok plugin to run the code.
 
 ** Only the POST method that allows to add new users will work.
