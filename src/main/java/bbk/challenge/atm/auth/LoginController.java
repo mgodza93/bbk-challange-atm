@@ -36,7 +36,7 @@ public class LoginController {
         }
 
         if (jwt == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("Unauthorized",HttpStatus.UNAUTHORIZED);
         } else {
             return ResponseEntity.ok(jwt);
         }

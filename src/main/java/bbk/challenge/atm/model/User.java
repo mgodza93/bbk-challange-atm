@@ -1,9 +1,7 @@
 package bbk.challenge.atm.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
@@ -14,6 +12,8 @@ import javax.persistence.*;
 @Table(name = "users")
 @EqualsAndHashCode(exclude = {"id", "password"})
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ApiObject(name = "User", description = "User entity saved in the database")
 public class User {
 

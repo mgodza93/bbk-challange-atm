@@ -33,12 +33,8 @@ public class UserController {
     ) {
         try {
             User savedUser = userService.saveUser(user);
-            if (savedUser == null) {
-                //TODO user already exists
-            }
             return ResponseEntity.ok(savedUser);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

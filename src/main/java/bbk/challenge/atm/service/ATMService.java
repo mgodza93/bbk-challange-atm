@@ -3,10 +3,7 @@ package bbk.challenge.atm.service;
 import bbk.challenge.atm.auth.AuthenticationService;
 import bbk.challenge.atm.model.Transaction;
 import bbk.challenge.atm.model.TransactionType;
-import bbk.challenge.atm.utils.AuthenticationException;
-import bbk.challenge.atm.utils.AuthorizationException;
-import bbk.challenge.atm.utils.InputInvalidException;
-import bbk.challenge.atm.utils.MaxAmountExceededException;
+import bbk.challenge.atm.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +15,17 @@ import java.util.concurrent.ConcurrentMap;
 @Service
 public class ATMService {
 
-    @Autowired private InputValidationService inputValidationService;
+    @Autowired
+    private InputValidationService inputValidationService;
 
-    @Autowired private TransactionsService transactionsService;
+    @Autowired
+    private TransactionsService transactionsService;
 
-    @Autowired private AuthenticationService authenticationService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
-    @Autowired private KnapsackService knapsackService;
+    @Autowired
+    private KnapsackService knapsackService;
 
     private ConcurrentMap<String, Integer> denominatorToCount = new ConcurrentHashMap<>();
     private Integer noBills = 0;
@@ -39,7 +40,7 @@ public class ATMService {
 
         String userName = authenticationService.getUserName(authentication);
 
-        if (authenticationService.hasWriteAccess(authentication)) {
+        if (!authenticationService.hasWriteAccess(authentication)) {
             throw new AuthorizationException(String.format("User: %s is not allowed to add money", userName));
         }
 
@@ -51,11 +52,13 @@ public class ATMService {
         for (Map.Entry<String, Integer> entry : denominatorToCount.entrySet()) {
             String addingKey = entry.getKey();
             Integer addingValue = entry.getValue();
-            this.denominatorToCount.computeIfPresent(addingKey,
-                    (existingKey, existingValue) -> existingValue + addingValue);
+            this.denominatorToCount.merge(addingKey, addingValue, Integer::sum);
             addingNoBills += addingValue;
             addingAmount += Integer.valueOf(addingKey) * addingValue;
         }
+
+        this.noBills += addingNoBills;
+        this.maxAmount += addingAmount;
 
         Transaction transaction = Transaction.builder()
                 .userName(userName)
@@ -69,7 +72,7 @@ public class ATMService {
     }
 
     public Map<String, Integer> withdrawCash(String authentication, Long amount)
-            throws AuthenticationException, AuthorizationException, MaxAmountExceededException {
+            throws AuthenticationException, AuthorizationException, MaxAmountExceededException, PerformException {
 
         if (!authenticationService.authenticatedUser(authentication)) {
             throw new AuthenticationException(String.format("%s authentication is not valid", authentication));
@@ -77,7 +80,7 @@ public class ATMService {
 
         String userName = authenticationService.getUserName(authentication);
 
-        if (authenticationService.hasWriteAccess(authentication)) {
+        if (!authenticationService.hasReadAccess(authentication)) {
             throw new AuthorizationException(String.format("User: %s is not allowed to retrieve money", userName));
         }
 
@@ -89,6 +92,10 @@ public class ATMService {
         Map<String, Integer> denominatorToCashOfWithdraw = knapsackService.getDenominatorToCashOfWithdraw(
                 denominatorToCount, amount);
 
+        if (denominatorToCashOfWithdraw == null || denominatorToCashOfWithdraw.isEmpty()) {
+            throw new PerformException(String.format("Could not satisfy the withdraw! The bills doesn't allow to extract exactly %d", amount));
+        }
+
         int noBillsToWithdraw = denominatorToCashOfWithdraw.values().stream().mapToInt(Integer::intValue).sum();
 
         this.noBills -= noBillsToWithdraw;
@@ -99,6 +106,7 @@ public class ATMService {
 
     @PreDestroy
     public void clear() {
+
         denominatorToCount.clear();
         noBills = 0;
         maxAmount = 0L;
